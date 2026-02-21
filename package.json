@@ -1,6 +1,5 @@
 {
   "name": "jewelry_store",
-  "license": "0BSD",
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
@@ -10,14 +9,28 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "expo": "~54.0.33",
-    "expo-status-bar": "~3.0.9",
-    "react": "19.1.0",
-    "react-native": "0.81.5"
+    "@react-native-async-storage/async-storage": "2.1.2",
+    "@react-navigation/native": "^7.1.28",
+    "@react-navigation/stack": "^7.7.2",
+    "expo": "^53.0.0",
+    "expo-asset": "~11.1.7",
+    "expo-localization": "~16.1.6",
+    "expo-splash-screen": "~0.30.10",
+    "expo-sqlite": "~15.2.14",
+    "expo-status-bar": "~2.2.3",
+    "i18next": "^25.8.13",
+    "lucide-react-native": "^0.575.0",
+    "react": "19.0.0",
+    "react-i18next": "^16.5.4",
+    "react-native": "0.79.6",
+    "react-native-gesture-handler": "~2.24.0",
+    "react-native-safe-area-context": "5.4.0",
+    "react-native-screens": "~4.11.1",
+    "react-native-svg": "^15.15.3"
   },
   "devDependencies": {
-    "@types/react": "~19.1.0",
-    "typescript": "~5.9.2"
+    "@types/react": "~19.0.10",
+    "typescript": "~5.8.3"
   },
   "private": true
 }
