@@ -12,7 +12,10 @@ i18n.use(initReactI18next).init({
         settings: "Settings",
         darkTheme: "Dark Mode",
         lang: "Language",
-        noAds: "No ads yet"
+        noAds: "No ads yet",
+        appearance: "Appearance",
+        appSettings: "Application",
+        details: "Details",
       }
     },
     ru: {
@@ -23,7 +26,10 @@ i18n.use(initReactI18next).init({
         settings: "Настройки",
         darkTheme: "Темная тема",
         lang: "Язык",
-        noAds: "Объявлений пока нет"
+        noAds: "Объявлений пока нет",
+        appearance: "Внешний вид",
+        appSettings: "Приложение",
+        details: "Детали",
       }
     }
   },

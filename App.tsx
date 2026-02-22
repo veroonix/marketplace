@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import './i18n'; // Импорт инициализации переводов
+import './i18n';
 import * as SplashScreen from 'expo-splash-screen';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AppNavigator } from './navigation/AppNavigator'; // Путь к навигатору
 import { initDB } from './database';
+import { ThemeProvider } from './context/ThemeContext';
+import { ThemedNavigation } from './components/ThemedNavigation';
 
-
-// Удерживаем сплеш-экран
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
@@ -17,14 +15,12 @@ export default function App() {
   useEffect(() => {
     async function prepare() {
       try {
-        // 1. Инициализируем базу данных
         await initDB();
-        
-        // 2. Загружаем сохраненную тему (Требование №4)
         const savedTheme = await AsyncStorage.getItem('theme');
-        if (savedTheme) setTheme(savedTheme as 'light' | 'dark');
-        
-        // Небольшая задержка для красоты (чтобы увидеть сплеш)
+        if (savedTheme === 'dark' || savedTheme === 'light') {
+          setTheme(savedTheme);
+        }
+        // Небольшая задержка
         await new Promise(resolve => setTimeout(resolve, 2000));
       } catch (e) {
         console.warn(e);
@@ -40,8 +36,8 @@ export default function App() {
   if (!isReady) return null;
 
   return (
-    <NavigationContainer theme={theme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AppNavigator />
-    </NavigationContainer>
+    <ThemeProvider initialTheme={theme}>
+      <ThemedNavigation />
+    </ThemeProvider>
   );
 }

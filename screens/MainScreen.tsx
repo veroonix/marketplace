@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   View,
   FlatList,
@@ -7,20 +7,22 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
-  Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
-import { Plus, Settings, PackageOpen } from 'lucide-react-native'; // Иконки
+import { Plus, Settings, PackageOpen } from 'lucide-react-native';
 import { RootStackParamList, Ad } from '../types';
 import { getAllAds, addAd } from '../database';
+import { useTheme } from '../context/ThemeContext';
+import { Colors } from '../constants/Colors';
 
 type MainScreenProps = StackNavigationProp<RootStackParamList, 'Main'>;
 
 export default function MainScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation<MainScreenProps>();
+  const { theme, isDark } = useTheme();
   const [ads, setAds] = useState<Ad[]>([]);
 
   const loadData = async () => {
@@ -58,18 +60,112 @@ export default function MainScreen() {
     </TouchableOpacity>
   );
 
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: Colors[theme].background,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingVertical: 15,
+      backgroundColor: Colors[theme].card,
+      borderBottomWidth: 1,
+      borderBottomColor: Colors[theme].border,
+    },
+    headerTitle: {
+      fontSize: 24,
+      fontWeight: '800',
+      color: Colors[theme].text,
+      letterSpacing: -0.5,
+    },
+    iconButton: {
+      padding: 8,
+      backgroundColor: Colors[theme].iconBackground,
+      borderRadius: 12,
+    },
+    listContent: {
+      paddingBottom: 100,
+      paddingTop: 10,
+    },
+    card: {
+      backgroundColor: Colors[theme].card,
+      marginHorizontal: 16,
+      marginVertical: 8,
+      borderRadius: 16,
+      padding: 16,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.05,
+      shadowRadius: 10,
+      elevation: 3,
+    },
+    cardContent: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+    },
+    textContainer: {
+      flex: 1,
+      marginRight: 10,
+    },
+    adTitle: {
+      fontSize: 17,
+      fontWeight: '600',
+      color: Colors[theme].text,
+      marginBottom: 4,
+    },
+    adPrice: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: Colors[theme].primary, // используем акцентный цвет (зелёный)
+    },
+    adDate: {
+      fontSize: 12,
+      color: Colors[theme].secondaryText,
+      fontWeight: '500',
+    },
+    emptyContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 100,
+    },
+    emptyText: {
+      marginTop: 12,
+      fontSize: 16,
+      color: Colors[theme].secondaryText,
+    },
+    fab: {
+      position: 'absolute',
+      bottom: 30,
+      right: 20,
+      backgroundColor: Colors[theme].primary,
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      justifyContent: 'center',
+      alignItems: 'center',
+      elevation: 8,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 6,
+    },
+  }), [theme]);
+
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       
-      {/* Custom Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{t('mainTitle')}</Text>
         <TouchableOpacity 
           onPress={() => navigation.navigate('Settings')}
           style={styles.iconButton}
         >
-          <Settings size={24} color="#1A1A1A" />
+          <Settings size={24} color={Colors[theme].text} />
         </TouchableOpacity>
       </View>
 
@@ -81,13 +177,12 @@ export default function MainScreen() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <PackageOpen size={64} color="#CCC" />
+            <PackageOpen size={64} color={Colors[theme].secondaryText} />
             <Text style={styles.emptyText}>{t('noAds')}</Text>
           </View>
         }
       />
 
-      {/* Floating Action Button */}
       <TouchableOpacity 
         style={styles.fab} 
         onPress={handleAddTestAd}
@@ -98,100 +193,3 @@ export default function MainScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F2F4F7', // Светло-серый фон как в современных iOS приложениях
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: '#FFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#1A1A1A',
-    letterSpacing: -0.5,
-  },
-  iconButton: {
-    padding: 8,
-    backgroundColor: '#F0F0F0',
-    borderRadius: 12,
-  },
-  listContent: {
-    paddingBottom: 100, // Отступ снизу, чтобы FAB не перекрывал контент
-    paddingTop: 10,
-  },
-  card: {
-    backgroundColor: '#FFF',
-    marginHorizontal: 16,
-    marginVertical: 8,
-    borderRadius: 16,
-    padding: 16,
-    // Тени для iOS
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    // Тени для Android
-    elevation: 3,
-  },
-  cardContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  textContainer: {
-    flex: 1,
-    marginRight: 10,
-  },
-  adTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#1A1A1A',
-    marginBottom: 4,
-  },
-  adPrice: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#007AFF', // Акцентный синий
-  },
-  adDate: {
-    fontSize: 12,
-    color: '#8E8E93',
-    fontWeight: '500',
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 100,
-  },
-  emptyText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: '#8E8E93',
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 30,
-    right: 20,
-    backgroundColor: '#1A1A1A', // Стильный черный
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-  },
-});
