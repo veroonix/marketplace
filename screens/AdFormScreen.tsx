@@ -1,18 +1,19 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   Alert,
   ScrollView,
   StatusBar,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { ArrowLeft } from 'lucide-react-native';
 import { useTheme } from '../context/ThemeContext';
 import { Colors } from '../constants/Colors';
 import { RootStackParamList } from '../types';
@@ -26,19 +27,13 @@ export default function AdFormScreen() {
   const navigation = useNavigation<AdFormNavigationProp>();
   const route = useRoute<AdFormRouteProp>();
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
   const adId = route.params?.adId;
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [loading, setLoading] = useState(false);
-
-  // Динамический заголовок в зависимости от режима (добавление/редактирование)
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      title: adId ? t('editAd') : t('addAd'),
-    });
-  }, [navigation, adId, t]);
 
   useEffect(() => {
     if (adId) {
@@ -69,7 +64,7 @@ export default function AdFormScreen() {
       title: title.trim(),
       description: description.trim(),
       price: price.trim(),
-      date: new Date().toLocaleDateString(), // Дата на устройстве (можно локализовать через i18n, если нужно)
+      date: new Date().toLocaleDateString(),
     };
 
     setLoading(true);
@@ -89,63 +84,30 @@ export default function AdFormScreen() {
     }
   };
 
-  const styles = getStyles(theme);
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.form}>
-          <Text style={styles.label}>{t('title')} *</Text>
-          <TextInput
-            style={styles.input}
-            value={title}
-            onChangeText={setTitle}
-            placeholder={t('placeholderTitle')}
-            placeholderTextColor={Colors[theme].secondaryText}
-          />
-
-          <Text style={styles.label}>{t('description')}</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            value={description}
-            onChangeText={setDescription}
-            placeholder={t('placeholderDescription')}
-            placeholderTextColor={Colors[theme].secondaryText}
-            multiline
-            numberOfLines={4}
-            textAlignVertical="top"
-          />
-
-          <Text style={styles.label}>{t('price')}</Text>
-          <TextInput
-            style={styles.input}
-            value={price}
-            onChangeText={setPrice}
-            placeholder={t('placeholderPrice')}
-            placeholderTextColor={Colors[theme].secondaryText}
-          />
-
-          <TouchableOpacity
-            style={[styles.saveButton, loading && styles.disabledButton]}
-            onPress={handleSave}
-            disabled={loading}
-          >
-            <Text style={styles.saveButtonText}>
-              {loading ? t('saving') : (adId ? t('update') : t('add'))}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
-
-const getStyles = (theme: 'light' | 'dark') =>
-  StyleSheet.create({
+  const styles = useMemo(() => StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: Colors[theme].background,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      backgroundColor: Colors[theme].card,
+      borderBottomWidth: 1,
+      borderBottomColor: Colors[theme].border,
+    },
+    backButton: {
+      padding: 8,
+      borderRadius: 12,
+      backgroundColor: Colors[theme].iconBackground,
+      marginRight: 16,
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: Colors[theme].text,
     },
     scrollContent: {
       flexGrow: 1,
@@ -195,4 +157,65 @@ const getStyles = (theme: 'light' | 'dark') =>
       fontSize: 16,
       fontWeight: '700',
     },
-  });
+  }), [theme]);
+
+  return (
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
+      
+      {/* Кастомный хедер */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <ArrowLeft size={24} color={Colors[theme].text} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>
+          {adId ? t('editAd') : t('addAd')}
+        </Text>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.form}>
+          <Text style={styles.label}>{t('title')} *</Text>
+          <TextInput
+            style={styles.input}
+            value={title}
+            onChangeText={setTitle}
+            placeholder={t('placeholderTitle')}
+            placeholderTextColor={Colors[theme].secondaryText}
+          />
+
+          <Text style={styles.label}>{t('description')}</Text>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            value={description}
+            onChangeText={setDescription}
+            placeholder={t('placeholderDescription')}
+            placeholderTextColor={Colors[theme].secondaryText}
+            multiline
+            numberOfLines={4}
+            textAlignVertical="top"
+          />
+
+          <Text style={styles.label}>{t('price')}</Text>
+          <TextInput
+            style={styles.input}
+            value={price}
+            onChangeText={setPrice}
+            placeholder={t('placeholderPrice')}
+            placeholderTextColor={Colors[theme].secondaryText}
+          />
+
+          <TouchableOpacity
+            style={[styles.saveButton, loading && styles.disabledButton]}
+            onPress={handleSave}
+            disabled={loading}
+          >
+            <Text style={styles.saveButtonText}>
+              {loading ? t('saving') : (adId ? t('update') : t('add'))}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
+  );
+}

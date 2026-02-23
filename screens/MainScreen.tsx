@@ -5,7 +5,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   Alert,
 } from 'react-native';
@@ -13,6 +12,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
 import { Plus, Settings, PackageOpen, Edit, Trash2 } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RootStackParamList, Ad } from '../types';
 import { getAllAds, deleteAd } from '../database';
 import { useTheme } from '../context/ThemeContext';
@@ -24,6 +24,7 @@ export default function MainScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation<MainScreenProps>();
   const { theme, isDark } = useTheme();
+  const insets = useSafeAreaInsets();
   const [ads, setAds] = useState<Ad[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -32,7 +33,6 @@ export default function MainScreen() {
     setAds(data);
   };
 
-  // Обновляем данные при возвращении на экран (например, после добавления/редактирования)
   useFocusEffect(
     useCallback(() => {
       loadData();
@@ -51,7 +51,7 @@ export default function MainScreen() {
           onPress: async () => {
             try {
               await deleteAd(id);
-              await loadData(); // перезагружаем список
+              await loadData();
             } catch (error) {
               Alert.alert('Ошибка', 'Не удалось удалить объявление');
             }
@@ -201,7 +201,7 @@ export default function MainScreen() {
   }), [theme]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       
       <View style={styles.header}>
@@ -241,6 +241,6 @@ export default function MainScreen() {
       >
         <Plus color="#FFF" size={28} />
       </TouchableOpacity>
-    </SafeAreaView>
+    </View>
   );
 }

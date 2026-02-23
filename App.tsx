@@ -6,6 +6,8 @@ import { initDB } from './database';
 import { ThemeProvider } from './context/ThemeContext';
 import { ThemedNavigation } from './components/ThemedNavigation';
 import i18n from './i18n'; 
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
 
 SplashScreen.preventAutoHideAsync();
 
@@ -41,8 +43,11 @@ export default function App() {
   if (!isReady) return null;
 
   return (
-    <ThemeProvider initialTheme={theme}>
-      <ThemedNavigation />
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider initialTheme={theme}>
+        <ThemedNavigation />
+      </ThemeProvider>
+    </SafeAreaProvider>
+    
   );
 }

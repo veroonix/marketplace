@@ -17,23 +17,21 @@ export const AppNavigator = () => {
     <Stack.Navigator 
       initialRouteName="Main"
       screenOptions={{
-        // Белый чистый фон для хедера (как в современных iOS приложениях)
         headerStyle: { 
           backgroundColor: '#FFFFFF',
-          elevation: 0,            // Убираем тень на Android
-          shadowOpacity: 0,        // Убираем тень на iOS
-          borderBottomWidth: 1,    // Добавляем тонкую линию вместо жирной тени
+          elevation: 0,           
+          shadowOpacity: 0,        
+          borderBottomWidth: 1,    
           borderBottomColor: '#F2F2F2',
         },
-        headerTintColor: '#1A1A1A', // Цвет стрелки "Назад" и текста
+        headerTintColor: '#1A1A1A', 
         headerTitleStyle: { 
           fontWeight: '700', 
           fontSize: 18,
           color: '#1A1A1A',
         },
-        //headerBackTitleVisible: false, // Скрываем текст "Back" на iOS для минимализма
-        cardStyle: { backgroundColor: '#F8F9FA' }, // Общий фон для всех экранов
-        headerTitleAlign: 'center', // Центрируем заголовок для единообразия
+        cardStyle: { backgroundColor: '#F8F9FA' }, 
+        headerTitleAlign: 'center', 
       }}
     >
       <Stack.Screen 
@@ -41,7 +39,7 @@ export const AppNavigator = () => {
         component={MainScreen} 
         options={{ 
           title: t('mainTitle'),
-          headerShown: false, // Мы нарисовали красивый кастомный хедер в самом MainScreen
+          headerShown: false, 
         }} 
       />
       
@@ -50,7 +48,7 @@ export const AppNavigator = () => {
         component={DetailsScreen} 
         options={{ 
           title: t('details'), 
-          headerShown: false, // Мы сделали кастомный прозрачный хедер внутри DetailsScreen
+          headerShown: false,
         }} 
       />
       
@@ -59,7 +57,7 @@ export const AppNavigator = () => {
         component={SettingsScreen} 
         options={{ 
           title: t('settings'),
-          headerShown: true, // Здесь оставляем стандартный, он отлично впишется
+          headerShown: false, 
           headerTitleAlign: Platform.OS === 'android' ? 'left' : 'center',
         }} 
       />
@@ -69,7 +67,7 @@ export const AppNavigator = () => {
         component={AdFormScreen} 
           options={{ 
           title: t('addAd'),          
-          headerShown: true,           
+          headerShown: false,           
           headerTitleAlign: Platform.OS === 'android' ? 'left' : 'center',
         }} 
       />

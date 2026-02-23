@@ -36,6 +36,8 @@ i18n.use(initReactI18next).init({
         failedSaveAd: "Failed to save ad",
         failedLoadAd: "Failed to load ad",
         titleRequired: "Title is required",
+        date: "date",
+        added: "Added"
       }
     },
     ru: {
@@ -68,7 +70,7 @@ i18n.use(initReactI18next).init({
         failedSaveAd: "Не удалось сохранить объявление",
         failedLoadAd: "Не удалось загрузить объявление",
         titleRequired: "Название обязательно",
-        
+        added: "Добавлено"
       }
     }
   },

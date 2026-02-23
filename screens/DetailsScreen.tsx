@@ -3,12 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   StatusBar,
   TouchableOpacity,
 } from 'react-native';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../types';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
@@ -24,6 +24,7 @@ export default function DetailsScreen() {
   const route = useRoute<DetailsRouteProp>();
   const { ad } = route.params;
   const { theme, isDark } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const styles = useMemo(() => StyleSheet.create({
     container: {
@@ -92,7 +93,7 @@ export default function DetailsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       
       {/* Кастомный хедер */}
@@ -113,8 +114,8 @@ export default function DetailsScreen() {
         <Text style={styles.title}>{ad.title}</Text>
         <Text style={styles.price}>{ad.price}</Text>
         <Text style={styles.description}>{ad.description}</Text>
-        <Text style={styles.date}>{t('date')}: {ad.date}</Text>
+        <Text style={styles.date}>{t('added')}: {ad.date}</Text>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
