@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './i18n';
 import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { initDB } from './database';
+import { initDB, seedAdsIfNeeded } from './database';
 import { ThemeProvider } from './context/ThemeContext';
 import { ThemedNavigation } from './components/ThemedNavigation';
 import i18n from './i18n'; 
@@ -15,11 +15,12 @@ SplashScreen.preventAutoHideAsync();
 export default function App() {
   const [isReady, setIsReady] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
+  
   useEffect(() => {
     async function prepare() {
       try {
         await initDB();
+        await seedAdsIfNeeded();
         const savedTheme = await AsyncStorage.getItem('theme');
         if (savedTheme === 'dark' || savedTheme === 'light') {
           setTheme(savedTheme);

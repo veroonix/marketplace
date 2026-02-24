@@ -56,13 +56,19 @@ export default function MainScreen() {
               await deleteAd(id);
               await loadData();
             } catch (error) {
-              Alert.alert('Ошибка', 'Не удалось удалить объявление');
+              Alert.alert(t('error'), t('failedDeleteAd'));
             }
           },
         },
       ]
     );
   };
+
+  const getPriceDisplay = useCallback((ad: Ad) => {
+    if (ad.dealType === 'free') return t('free');
+    if (ad.dealType === 'exchange') return t('exchange');
+    return ad.price ? `${ad.price} ${ad.currency || ''}` : '';
+  }, [t]);
 
   const renderItem = ({ item }: { item: Ad }) => (
     <View style={localStyles.card}>
@@ -74,7 +80,7 @@ export default function MainScreen() {
         <View style={localStyles.cardContent}>
           <View style={localStyles.textContainer}>
             <Text style={localStyles.adTitle} numberOfLines={1}>{item.title}</Text>
-            <Text style={localStyles.adPrice}>{item.price}</Text>
+            <Text style={localStyles.adPrice}>{getPriceDisplay(item)}</Text>
           </View>
           <Text style={localStyles.adDate}>{item.date}</Text>
         </View>

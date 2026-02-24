@@ -29,6 +29,12 @@ export default function DetailsScreen() {
 
   const shared = useMemo(() => getSharedStyles(theme), [theme]);
 
+  const getPriceDisplay = () => {
+    if (ad.dealType === 'free') return t('free');
+    if (ad.dealType === 'exchange') return t('exchange');
+    return ad.price ? `${ad.price} ${ad.currency || ''}` : '';
+  };
+
   const localStyles = useMemo(() => StyleSheet.create({
     content: {
       padding: 20,
@@ -53,7 +59,11 @@ export default function DetailsScreen() {
     date: {
       fontSize: 14,
       color: Colors[theme].secondaryText,
-    }
+    },
+    header: {
+    ...shared.header,
+    justifyContent: 'space-between',
+  },
   }), [theme]);
 
   const handleEdit = () => {
@@ -65,7 +75,7 @@ export default function DetailsScreen() {
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       
       {/* Кастомный хедер */}
-      <View style={shared.header}>
+      <View style={localStyles.header }>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={shared.backButton}>
             <ArrowLeft size={24} color={Colors[theme].text} />
@@ -79,7 +89,7 @@ export default function DetailsScreen() {
 
       <View style={localStyles.content}>
         <Text style={localStyles.title}>{ad.title}</Text>
-        <Text style={localStyles.price}>{ad.price}</Text>
+        <Text style={localStyles.price}>{getPriceDisplay()}</Text>
         <Text style={localStyles.description}>{ad.description}</Text>
         <Text style={localStyles.date}>{t('added')}: {ad.date}</Text>
       </View>

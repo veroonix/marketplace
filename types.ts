@@ -1,9 +1,13 @@
+export type DealType = 'sale' | 'free' | 'exchange';
+
 export interface Ad {
   id?: number;
   title: string;
-  description: string;
-  price: string;    // Цена или пометка "Обмен"
-  date: string;     // Дата публикации
+  description: string | null;
+  price: string | null;        
+  currency: string | null;     
+  dealType: DealType;          
+  date: string;                
 }
 
 

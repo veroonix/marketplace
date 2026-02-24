@@ -8,7 +8,7 @@ i18n.use(initReactI18next).init({
       translation: {
         mainTitle: "Ads",
         addAd: "Post Ad",
-        price: "Price/Exchange",
+        price: "Price",
         settings: "Settings",
         darkTheme: "Dark Mode",
         lang: "Language",
@@ -22,6 +22,12 @@ i18n.use(initReactI18next).init({
         editAd: "Edit Ad",
         title: "Title",
         description: "Description",
+        dealType: "Deal type",
+        sale: "For sale",
+        free: "Free",
+        exchange: "Exchange",
+        freeInfo: "This item is free",
+        exchangeInfo: "This item is for exchange",
   
         placeholderTitle: "Enter title",
         placeholderDescription: "Enter description",
@@ -37,14 +43,17 @@ i18n.use(initReactI18next).init({
         failedLoadAd: "Failed to load ad",
         titleRequired: "Title is required",
         date: "date",
-        added: "Added"
+        added: "Added",
+        confirmDelete: "Are you sure you want to delete this ad?",
+        failedDeleteAd: "Failed to delete ad",
+        cancel: "Cancel",
       }
     },
     ru: {
       translation: {
         mainTitle: "Объявления",
         addAd: "Подать объявление",
-        price: "Цена/Обмен",
+        price: "Цена",
         settings: "Настройки",
         darkTheme: "Темная тема",
         lang: "Язык",
@@ -60,6 +69,12 @@ i18n.use(initReactI18next).init({
         placeholderTitle: "Введите название",
         placeholderDescription: "Введите описание",
         placeholderPrice: "Введите цену",
+        dealType: "Тип сделки",
+        sale: "Продажа",
+        free: "Бесплатно",
+        exchange: "Обмен",
+        freeInfo: "Этот товар отдается бесплатно",
+        exchangeInfo: "Предложение обмена",
         add: "Добавить",
         update: "Обновить",
         saving: "Сохранение...",
@@ -70,7 +85,10 @@ i18n.use(initReactI18next).init({
         failedSaveAd: "Не удалось сохранить объявление",
         failedLoadAd: "Не удалось загрузить объявление",
         titleRequired: "Название обязательно",
-        added: "Добавлено"
+        added: "Добавлено",
+        confirmDelete: "Вы уверены, что хотите удалить это объявление?",
+        failedDeleteAd: "Не удалось удалить объявление",
+        cancel: "Отмена",
       }
     }
   },

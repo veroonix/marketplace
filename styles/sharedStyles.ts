@@ -19,6 +19,7 @@ export const getSharedStyles = (theme: 'light' | 'dark') => {
       backgroundColor: colors.card,
       borderBottomWidth: 1,
       borderBottomColor: colors.border,
+      
     },
     headerTitle: {
       fontSize: 18,

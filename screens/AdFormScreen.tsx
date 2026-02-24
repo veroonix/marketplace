@@ -14,14 +14,17 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react-native';
+import { Picker } from '@react-native-picker/picker';
 import { useTheme } from '../context/ThemeContext';
 import { Colors } from '../constants/Colors';
-import { RootStackParamList } from '../types';
+import { RootStackParamList, DealType } from '../types';
 import { addAd, updateAd, getAdById } from '../database';
 import { getSharedStyles } from '../styles/sharedStyles';
 
 type AdFormRouteProp = RouteProp<RootStackParamList, 'AdForm'>;
 type AdFormNavigationProp = StackNavigationProp<RootStackParamList, 'AdForm'>;
+
+const CURRENCIES = ['BYN', 'USD', 'EUR'];
 
 export default function AdFormScreen() {
   const { t } = useTranslation();
@@ -34,6 +37,8 @@ export default function AdFormScreen() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
+  const [dealType, setDealType] = useState<DealType>('sale');
+  const [currency, setCurrency] = useState('BYN');
   const [loading, setLoading] = useState(false);
 
   const shared = useMemo(() => getSharedStyles(theme), [theme]);
@@ -51,6 +56,8 @@ export default function AdFormScreen() {
         setTitle(ad.title);
         setDescription(ad.description || '');
         setPrice(ad.price || '');
+        setDealType(ad.dealType);
+        setCurrency(ad.currency || 'BYN');
       }
     } catch (error) {
       Alert.alert(t('error'), t('failedLoadAd'));
@@ -63,10 +70,15 @@ export default function AdFormScreen() {
       return;
     }
 
+    const finalPrice = dealType === 'sale' ? price.trim() : null;
+    const finalCurrency = dealType === 'sale' ? currency : null;
+
     const adData = {
       title: title.trim(),
       description: description.trim(),
-      price: price.trim(),
+      price: finalPrice,
+      currency: finalCurrency,
+      dealType,
       date: new Date().toLocaleDateString(),
     };
 
@@ -86,6 +98,25 @@ export default function AdFormScreen() {
       setLoading(false);
     }
   };
+
+  const renderDealTypeButton = (type: DealType, label: string) => (
+    <TouchableOpacity
+      style={[
+        localStyles.dealTypeButton,
+        dealType === type && localStyles.dealTypeButtonActive,
+      ]}
+      onPress={() => setDealType(type)}
+    >
+      <Text
+        style={[
+          localStyles.dealTypeText,
+          dealType === type && localStyles.dealTypeTextActive,
+        ]}
+      >
+        {label}
+      </Text>
+    </TouchableOpacity>
+  );
 
   const localStyles = useMemo(() => StyleSheet.create({
     scrollContent: {
@@ -121,6 +152,58 @@ export default function AdFormScreen() {
     textArea: {
       minHeight: 100,
     },
+    dealTypeContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 8,
+    },
+    dealTypeButton: {
+      flex: 1,
+      paddingVertical: 10,
+      marginHorizontal: 4,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: Colors[theme].border,
+      backgroundColor: Colors[theme].background,
+      alignItems: 'center',
+    },
+    dealTypeButtonActive: {
+      backgroundColor: Colors[theme].primary,
+      borderColor: Colors[theme].primary,
+    },
+    dealTypeText: {
+      fontWeight: '600',
+      color: Colors[theme].text,
+    },
+    dealTypeTextActive: {
+      color: '#FFF',
+    },
+    priceRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    priceInput: {
+      flex: 1,           
+      marginRight: 8,
+    },
+    pickerContainer: {
+      flex: 1,           // пикер тоже занимает половину
+      backgroundColor: Colors[theme].background,
+      borderWidth: 1,
+      borderColor: Colors[theme].border,
+      borderRadius: 12,
+      // overflow: 'hidden' удалено – на некоторых устройствах могло обрезать
+    },
+    picker: {
+      height: 50,
+      color: Colors[theme].text,
+    },
+    infoText: {
+      marginTop: 8,
+      fontSize: 14,
+      color: Colors[theme].secondaryText,
+      fontStyle: 'italic',
+    },
     saveButton: {
       backgroundColor: Colors[theme].primary,
       padding: 16,
@@ -141,15 +224,15 @@ export default function AdFormScreen() {
   return (
     <View style={[shared.container, { paddingTop: insets.top }]}>
       <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
-      
-      {/* Кастомный хедер */}
       <View style={shared.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={shared.backButton}>
-          <ArrowLeft size={24} color={Colors[theme].text} />
-        </TouchableOpacity>
-        <Text style={shared.headerTitle}>
-          {adId ? t('editAd') : t('addAd')}
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={shared.backButton}>
+            <ArrowLeft size={24} color={Colors[theme].text} />
+          </TouchableOpacity>
+          <Text style={shared.headerTitle}>
+            {adId ? t('editAd') : t('addAd')}
+          </Text>
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={localStyles.scrollContent}>
@@ -163,6 +246,49 @@ export default function AdFormScreen() {
             placeholderTextColor={Colors[theme].secondaryText}
           />
 
+          <Text style={localStyles.label}>{t('dealType')}</Text>
+          <View style={localStyles.dealTypeContainer}>
+            {renderDealTypeButton('sale', t('sale'))}
+            {renderDealTypeButton('free', t('free'))}
+            {renderDealTypeButton('exchange', t('exchange'))}
+          </View>
+
+          {dealType === 'sale' && (
+            <>
+              <Text style={localStyles.label}>{t('price')}</Text>
+              <View style={localStyles.priceRow}>
+                <TextInput
+                  style={[localStyles.input, localStyles.priceInput]}
+                  value={price}
+                  onChangeText={setPrice}
+                  placeholder={t('placeholderPrice')}
+                  placeholderTextColor={Colors[theme].secondaryText}
+                  keyboardType="numeric"
+                />
+                <View style={localStyles.pickerContainer}>
+                  <Picker
+                    selectedValue={currency}
+                    onValueChange={(itemValue) => setCurrency(itemValue)}
+                    style={localStyles.picker}
+                    dropdownIconColor={Colors[theme].text}
+                  >
+                    {CURRENCIES.map((cur) => (
+                      <Picker.Item key={cur} label={cur} value={cur} />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
+            </>
+          )}
+
+          {dealType === 'free' && (
+            <Text style={localStyles.infoText}>{t('freeInfo')}</Text>
+          )}
+
+          {dealType === 'exchange' && (
+            <Text style={localStyles.infoText}>{t('exchangeInfo')}</Text>
+          )}
+
           <Text style={localStyles.label}>{t('description')}</Text>
           <TextInput
             style={[localStyles.input, localStyles.textArea]}
@@ -173,15 +299,6 @@ export default function AdFormScreen() {
             multiline
             numberOfLines={4}
             textAlignVertical="top"
-          />
-
-          <Text style={localStyles.label}>{t('price')}</Text>
-          <TextInput
-            style={localStyles.input}
-            value={price}
-            onChangeText={setPrice}
-            placeholder={t('placeholderPrice')}
-            placeholderTextColor={Colors[theme].secondaryText}
           />
 
           <TouchableOpacity
